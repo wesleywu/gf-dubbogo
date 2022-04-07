@@ -73,6 +73,7 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 	registryConfigBuilder.SetParams(map[string]string{
 		constant.NacosLogDirKey:   loggerPath,
 		constant.NacosCacheDirKey: loggerPath,
+		constant.NacosLogLevelKey: loggerLevel,
 	})
 
 	rootConfig := config.NewRootConfigBuilder().
@@ -146,6 +147,7 @@ func StartProvider(ctx context.Context, providerName string, implClassName strin
 	registryConfigBuilder.SetParams(map[string]string{
 		constant.NacosLogDirKey:   loggerPath,
 		constant.NacosCacheDirKey: loggerPath,
+		constant.NacosLogLevelKey: loggerLevel,
 	})
 
 	rootConfig := config.NewRootConfigBuilder().
