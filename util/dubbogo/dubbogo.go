@@ -3,6 +3,7 @@ package dubbogo
 import (
 	"context"
 	"dubbo.apache.org/dubbo-go/v3/common"
+	"dubbo.apache.org/dubbo-go/v3/common/constant"
 	"dubbo.apache.org/dubbo-go/v3/common/extension"
 	"dubbo.apache.org/dubbo-go/v3/config"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -68,6 +69,11 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 		loggerOutputPaths = []string{loggerPath}
 		loggerErrorOutputPaths = []string{loggerPath}
 	}
+
+	registryConfigBuilder.SetParams(map[string]string{
+		constant.NacosLogDirKey:   loggerPath,
+		constant.NacosCacheDirKey: loggerPath,
+	})
 
 	rootConfig := config.NewRootConfigBuilder().
 		AddRegistry(registryId, registryConfigBuilder.Build()).
