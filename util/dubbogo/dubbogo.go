@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/natefinch/lumberjack"
+	"path"
 	"strconv"
 )
 
@@ -78,7 +79,7 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 				ErrorOutputPaths: loggerErrorOutputPaths,
 			}).
 			SetLumberjackConfig(&lumberjack.Logger{
-				Filename: loggerFileName,
+				Filename: path.Join(loggerPath, loggerFileName),
 			}).Build()).
 		SetConsumer(consumerConfig).
 		Build()
