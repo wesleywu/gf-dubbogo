@@ -143,6 +143,11 @@ func StartProvider(ctx context.Context, providerName string, implClassName strin
 		loggerErrorOutputPaths = []string{loggerPath}
 	}
 
+	registryConfigBuilder.SetParams(map[string]string{
+		constant.NacosLogDirKey:   loggerPath,
+		constant.NacosCacheDirKey: loggerPath,
+	})
+
 	rootConfig := config.NewRootConfigBuilder().
 		SetProvider(config.NewProviderConfigBuilder().
 			AddService(implClassName, config.NewServiceConfigBuilder().
@@ -160,7 +165,7 @@ func StartProvider(ctx context.Context, providerName string, implClassName strin
 				ErrorOutputPaths: loggerErrorOutputPaths,
 			}).
 			SetLumberjackConfig(&lumberjack.Logger{
-				Filename: loggerFileName,
+				Filename: path.Join(loggerPath, loggerFileName),
 			}).Build()).
 		AddProtocol("tripleKey", config.NewProtocolConfigBuilder().
 			SetName("tri").
