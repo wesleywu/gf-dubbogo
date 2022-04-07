@@ -8,7 +8,6 @@ import (
 	"dubbo.apache.org/dubbo-go/v3/config"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/natefinch/lumberjack"
 	"path"
 	"strconv"
@@ -51,16 +50,20 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 	var (
 		loggerPath             string
 		loggerLevel            string
+		loggerFileName         string
 		development            bool
 		loggerStdout           bool
 		loggerOutputPaths      []string
 		loggerErrorOutputPaths []string
 	)
 	development = g.Cfg().MustGet(ctx, "server.debug", "true").Bool()
-	loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
 	loggerLevel = g.Cfg().MustGet(ctx, "logger.level", "debug").String()
 	loggerStdout = g.Cfg().MustGet(ctx, "logger.stdout", "true").Bool()
-	loggerFileName := g.Cfg().MustGet(ctx, "rpc.logFile.file", "consumer.log").String()
+	loggerPath = g.Cfg().MustGet(ctx, "rpc.consumer.logDir", "./data/log/gf-app").String()
+	if g.IsEmpty(loggerPath) {
+		loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
+	}
+	loggerFileName = g.Cfg().MustGet(ctx, "rpc.consumer.logFile", "consumer.log").String()
 
 	if loggerStdout {
 		loggerOutputPaths = []string{"stdout", loggerPath}
@@ -96,8 +99,8 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 	return nil
 }
 
-func StartProvider(ctx context.Context, providerName string, implClassName string, providerService common.RPCService, shutdownCallbacks ...func()) error {
-	port := g.Cfg().MustGet(ctx, "rpc.port."+providerName).String()
+func StartProvider(ctx context.Context, implClassName string, providerService common.RPCService, shutdownCallbacks ...func()) error {
+	port := g.Cfg().MustGet(ctx, "rpc.provider.port").String()
 	if _, err := strconv.Atoi(port); err != nil {
 		return gerror.New("需要指定整形的 port 参数，建议20000以上，不能和其他服务重复")
 	}
@@ -125,16 +128,20 @@ func StartProvider(ctx context.Context, providerName string, implClassName strin
 	var (
 		loggerPath             string
 		loggerLevel            string
+		loggerFileName         string
 		development            bool
 		loggerStdout           bool
 		loggerOutputPaths      []string
 		loggerErrorOutputPaths []string
 	)
 	development = g.Cfg().MustGet(ctx, "server.debug", "true").Bool()
-	loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
 	loggerLevel = g.Cfg().MustGet(ctx, "logger.level", "debug").String()
 	loggerStdout = g.Cfg().MustGet(ctx, "logger.stdout", "true").Bool()
-	loggerFileName := g.Cfg().MustGet(ctx, "rpc.logFile."+providerName, gstr.CaseSnake(providerName)+".log").String()
+	loggerPath = g.Cfg().MustGet(ctx, "rpc.provider.logDir", "./data/log/gf-app").String()
+	if g.IsEmpty(loggerPath) {
+		loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
+	}
+	loggerFileName = g.Cfg().MustGet(ctx, "rpc.provider.logFile", "provider.log").String()
 
 	if loggerStdout {
 		loggerOutputPaths = []string{"stdout", loggerPath}
