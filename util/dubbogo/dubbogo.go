@@ -100,6 +100,7 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 }
 
 func StartProvider(ctx context.Context, implClassName string, providerService common.RPCService, shutdownCallbacks ...func()) error {
+	ip := g.Cfg().MustGet(ctx, "rpc.provider.ip", "").String()
 	port := g.Cfg().MustGet(ctx, "rpc.provider.port").String()
 	if _, err := strconv.Atoi(port); err != nil {
 		return gerror.New("需要指定整形的 port 参数，建议20000以上，不能和其他服务重复")
@@ -157,6 +158,13 @@ func StartProvider(ctx context.Context, implClassName string, providerService co
 		constant.NacosLogLevelKey: loggerLevel,
 	})
 
+	protocolConfigBuilder := config.NewProtocolConfigBuilder().
+		SetName("tri").
+		SetPort(port)
+	if !g.IsEmpty(ip) {
+		protocolConfigBuilder = protocolConfigBuilder.SetIp(ip)
+	}
+
 	rootConfig := config.NewRootConfigBuilder().
 		SetProvider(config.NewProviderConfigBuilder().
 			AddService(implClassName, config.NewServiceConfigBuilder().
@@ -176,10 +184,7 @@ func StartProvider(ctx context.Context, implClassName string, providerService co
 			SetLumberjackConfig(&lumberjack.Logger{
 				Filename: path.Join(loggerPath, loggerFileName),
 			}).Build()).
-		AddProtocol("tripleKey", config.NewProtocolConfigBuilder().
-			SetName("tri").
-			SetPort(port).
-			Build()).
+		AddProtocol("tripleKey", protocolConfigBuilder.Build()).
 		Build()
 	if err := config.Load(config.WithRootConfig(rootConfig)); err != nil {
 		return err
