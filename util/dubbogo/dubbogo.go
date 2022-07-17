@@ -57,13 +57,13 @@ func StartConsumers(ctx context.Context, consumerTimeoutSeconds int) error {
 		loggerErrorOutputPaths []string
 	)
 	development = g.Cfg().MustGet(ctx, "server.debug", "true").Bool()
-	loggerLevel = g.Cfg().MustGet(ctx, "logger.level", "debug").String()
 	loggerStdout = g.Cfg().MustGet(ctx, "logger.stdout", "true").Bool()
 	loggerPath = g.Cfg().MustGet(ctx, "rpc.consumer.logDir", "./data/log/gf-app").String()
 	if g.IsEmpty(loggerPath) {
 		loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
 	}
 	loggerFileName = g.Cfg().MustGet(ctx, "rpc.consumer.logFile", "consumer.log").String()
+	loggerLevel = g.Cfg().MustGet(ctx, "rpc.provider.logLevel", "warn").String()
 
 	if loggerStdout {
 		loggerOutputPaths = []string{"stdout", loggerPath}
@@ -136,13 +136,13 @@ func StartProvider(ctx context.Context, implClassName string, providerService co
 		loggerErrorOutputPaths []string
 	)
 	development = g.Cfg().MustGet(ctx, "server.debug", "true").Bool()
-	loggerLevel = g.Cfg().MustGet(ctx, "logger.level", "debug").String()
 	loggerStdout = g.Cfg().MustGet(ctx, "logger.stdout", "true").Bool()
 	loggerPath = g.Cfg().MustGet(ctx, "rpc.provider.logDir", "./data/log/gf-app").String()
 	if g.IsEmpty(loggerPath) {
 		loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
 	}
 	loggerFileName = g.Cfg().MustGet(ctx, "rpc.provider.logFile", "provider.log").String()
+	loggerLevel = g.Cfg().MustGet(ctx, "rpc.provider.logLevel", "warn").String()
 
 	if loggerStdout {
 		loggerOutputPaths = []string{"stdout", loggerPath}
