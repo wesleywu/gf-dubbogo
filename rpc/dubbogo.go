@@ -7,7 +7,7 @@ import (
 
 func init() {
 	ctx := gctx.New()
-	err := dubbogo.StartConsumers(ctx, 180)
+	err := dubbogo.StartConsumersByCfg(ctx, false, 180)
 	if err != nil {
 		panic(err)
 	}
