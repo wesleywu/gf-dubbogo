@@ -22,12 +22,9 @@ func AddConsumerReference(consumer *ConsumerReference) {
 
 func buildConsumer(consumerOption *ConsumerOption) *config.ConsumerConfig {
 	if consumerOption.TimeoutSeconds > 0 {
-		return consumerConfigBuilder.
-			SetRequestTimeout(string(rune(consumerOption.TimeoutSeconds)) + "s").
-			SetCheck(consumerOption.CheckProviderExists).
-			Build()
+		consumerConfigBuilder.SetRequestTimeout(string(rune(consumerOption.TimeoutSeconds)) + "s")
 	}
-	return consumerConfigBuilder.Build()
+	return consumerConfigBuilder.SetCheck(consumerOption.CheckProviderExists).Build()
 }
 
 // StartConsumersByCfg 启动通过 AddConsumerReference 添加的所有的 Consumer, 从 config 配置文件中读取若干配置
