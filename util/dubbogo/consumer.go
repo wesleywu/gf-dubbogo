@@ -5,6 +5,7 @@ import (
 	"dubbo.apache.org/dubbo-go/v3/common/constant"
 	"dubbo.apache.org/dubbo-go/v3/config"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/natefinch/lumberjack"
 	"path"
 )
@@ -22,7 +23,7 @@ func AddConsumerReference(consumer *ConsumerReference) {
 
 func buildConsumer(consumerOption *ConsumerOption) *config.ConsumerConfig {
 	if consumerOption.TimeoutSeconds > 0 {
-		consumerConfigBuilder.SetRequestTimeout(string(rune(consumerOption.TimeoutSeconds)) + "s")
+		consumerConfigBuilder.SetRequestTimeout(gconv.String(consumerOption.TimeoutSeconds) + "s")
 	}
 	return consumerConfigBuilder.SetCheck(consumerOption.CheckProviderExists).Build()
 }
