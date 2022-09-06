@@ -21,54 +21,16 @@ func AddConsumerReference(consumer *ConsumerReference) {
 	config.SetConsumerService(consumer.Service)
 }
 
-func buildConsumer(consumerOption *ConsumerOption) *config.ConsumerConfig {
+func buildConsumerConfig(builder *config.ConsumerConfigBuilder, consumerOption *ConsumerOption) *config.ConsumerConfig {
 	if consumerOption.TimeoutSeconds > 0 {
-		consumerConfigBuilder.SetRequestTimeout(gconv.String(consumerOption.TimeoutSeconds) + "s")
+		builder.SetRequestTimeout(gconv.String(consumerOption.TimeoutSeconds) + "s")
 	}
-	return consumerConfigBuilder.SetCheck(consumerOption.CheckProviderExists).Build()
-}
-
-// StartConsumersByCfg 启动通过 AddConsumerReference 添加的所有的 Consumer, 从 config 配置文件中读取若干配置
-func StartConsumersByCfg(ctx context.Context, checkProviderExists bool, timeoutSeconds int) error {
-	registryId := g.Cfg().MustGet(ctx, "rpc.registry.id", "nacosRegistry").String()
-	registryProtocol := g.Cfg().MustGet(ctx, "rpc.registry.protocol", "nacos").String()
-	registryAddress := g.Cfg().MustGet(ctx, "rpc.registry.address", "127.0.0.1:8848").String()
-	registryConfigBuilder := config.NewRegistryConfigBuilder().
-		SetProtocol(registryProtocol).
-		SetAddress(registryAddress)
-	registryNamespace := g.Cfg().MustGet(ctx, "rpc.registry.namespace", "public").String()
-	if registryProtocol == "nacos" {
-		registryConfigBuilder = registryConfigBuilder.SetNamespace(registryNamespace)
-	}
-	development := g.Cfg().MustGet(ctx, "server.debug", "true").Bool()
-	loggerStdout := g.Cfg().MustGet(ctx, "logger.stdout", "true").Bool()
-	loggerPath := g.Cfg().MustGet(ctx, "rpc.consumer.logDir", "./data/log/gf-app").String()
-	if g.IsEmpty(loggerPath) {
-		loggerPath = g.Cfg().MustGet(ctx, "logger.path", "./data/log/gf-app").String()
-	}
-	loggerFileName := g.Cfg().MustGet(ctx, "rpc.consumer.logFile", "consumer.log").String()
-	loggerLevel := g.Cfg().MustGet(ctx, "rpc.provider.logLevel", "warn").String()
-
-	return StartConsumers(ctx, &Registry{
-		Id:        registryId,
-		Type:      registryProtocol,
-		Address:   registryAddress,
-		Namespace: registryNamespace,
-	}, &ConsumerOption{
-		CheckProviderExists: checkProviderExists,
-		TimeoutSeconds:      timeoutSeconds,
-	}, &LoggerOption{
-		Development: development,
-		Stdout:      loggerStdout,
-		LogDir:      loggerPath,
-		LogFileName: loggerFileName,
-		Level:       loggerLevel,
-	})
+	return builder.SetCheck(consumerOption.CheckProviderExists).Build()
 }
 
 // StartConsumers 启动通过 AddConsumerReference 添加的所有的 Consumer
 func StartConsumers(_ context.Context, registry *Registry, consumerOption *ConsumerOption, loggerOption *LoggerOption) error {
-	consumerConfig := buildConsumer(consumerOption)
+	consumerConfig := buildConsumerConfig(consumerConfigBuilder, consumerOption)
 	if len(consumerConfig.References) == 0 {
 		// return when there are no consumer references
 		return nil
