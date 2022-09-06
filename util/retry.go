@@ -16,7 +16,7 @@ const (
 type ServiceRetry[Req any, Res any] struct {
 }
 
-func (r *ServiceRetry[Req, Res]) CallRpcFunc(ctx context.Context, rpcReq Req, rpcFunc func(context.Context, Req) (Res, error), retryLimit int, retryIntervalMillis int64) (Res, error) {
+func (r *ServiceRetry[Req, Res]) CallRpcFunc(ctx context.Context, rpcFunc func(context.Context, Req) (Res, error), rpcReq Req, retryLimit int, retryIntervalMillis int64) (Res, error) {
 	var (
 		rpcRes Res
 		err    error
