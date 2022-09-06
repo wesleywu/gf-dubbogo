@@ -93,6 +93,15 @@ func StartProviderAndConsumers(_ context.Context, registry *Registry, provider *
 	}
 	consumerConfig := buildConsumerConfig(consumerConfigBuilder, consumerOption)
 
+	config.SetProviderService(provider.Service)
+	if provider.ShutdownCallbacks != nil {
+		extension.AddCustomShutdownCallback(func() {
+			for _, callback := range provider.ShutdownCallbacks {
+				callback()
+			}
+		})
+	}
+
 	registryConfigBuilder := config.NewRegistryConfigBuilder().
 		SetProtocol(registry.Type).
 		SetAddress(registry.Address)
