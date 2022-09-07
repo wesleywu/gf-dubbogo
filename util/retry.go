@@ -29,16 +29,13 @@ func (r *ServiceRetry[Req, Res]) CallRpcFunc(ctx context.Context, rpcFunc func(c
 		if providerError1 || providerError2 {
 			retry++
 			g.Log().Errorf(ctx, ErrorMessage, retry)
-			// 无限重试
+			// 如果是 provider 连接错误，无限重试
 			time.Sleep(time.Duration(retryIntervalMillis) * time.Millisecond)
 			rpcRes, err = rpcFunc(ctx, rpcReq)
 		} else {
+			// 如果是其他错误，打印日志退出无限重试循环
 			g.Log().Error(ctx, err)
-			retry++
-			g.Log().Errorf(ctx, ErrorMessage, retry)
-			// 无限重试
-			time.Sleep(time.Duration(retryIntervalMillis) * time.Millisecond)
-			rpcRes, err = rpcFunc(ctx, rpcReq)
+			break
 		}
 	}
 	return rpcRes, err
